@@ -1,5 +1,5 @@
+import { createApp } from 'vue'
 import './style.css'
-import { setupCounter } from './counter.ts'
+import App from './App.vue'
 
-
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+createApp(App).mount('#app')
