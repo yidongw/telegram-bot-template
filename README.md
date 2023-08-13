@@ -32,13 +32,17 @@ Follow these steps to set up and run your bot using this template:
 
     Start by creating a new repository using this template. You can do this by clicking [here](https://github.com/bot-base/telegram-bot-template/generate).
 
+2. **Build and Deploy Web App**
+    
+    Follow the instructions in [webapp/README.md](webapp/README.md).
+
 2. **Environment Variables Setup**
     
     Create an environment variables file by copying the provided example file:
      ```bash
      cp .env.example .env
      ```
-    Open the newly created `.env` file and set the `BOT_TOKEN` environment variable.
+    Open the newly created `.env` file and set the `BOT_TOKEN` and `WEB_APP_URL` environment variables.
 
 3. **Launching the Bot**
     
@@ -62,9 +66,10 @@ Follow these steps to set up and run your bot using this template:
     npm install --only=prod
     ```
     
-    Set the `NODE_ENV` environment variable to "production" in your `.env` file. Also, make sure to update `BOT_WEBHOOK` with the actual URL where your bot will receive updates.
+    Set the `NODE_ENV` environment variable to "production" and `WEB_APP_URL` to the production URL of web app in your `.env` file. Also, make sure to update `BOT_WEBHOOK` with the actual URL where your bot will receive updates.
     ```dotenv
     NODE_ENV=production
+    WEB_APP_URL=<your_webapp_url>
     BOT_WEBHOOK=<your_webhook_url>
     ```
     
@@ -258,6 +263,15 @@ git merge template/example/webapp-vue -X theirs --squash --no-commit --allow-unr
     </td>
     <td>
         Telegram Bot API token obtained from <a href="https://t.me/BotFather">@BotFather</a>.
+    </td>
+  </tr>
+  <tr>
+    <td>WEB_APP_URL</td>
+    <td>
+        String
+    </td>
+    <td>
+        HTTPS link to Web App.
     </td>
   </tr>
     <tr>

@@ -61,5 +61,8 @@
         "extensions": [".js", ".ts"]
       }
     }
-  }
+  },
+  "ignorePatterns": [
+    "webapp/"
+  ]
 }
