@@ -59,25 +59,19 @@ export function createServer(bot: Bot) {
 export type Server = Awaited<ReturnType<typeof createServer>>
 
 export function createServerManager(server: Server) {
-  let handle: undefined | ReturnType<typeof serve>
+  let handle: undefined | ReturnType<typeof Bun.serve>
   return {
-    start: (host: string, port: number) =>
-      new Promise<AddressInfo>((resolve) => {
-        handle = serve(
-          {
-            fetch: server.fetch,
-            hostname: host,
-            port,
-          },
-          info => resolve(info),
-        )
-      }),
+    start: (host: string, port: number) => {
+      handle = Bun.serve({
+        fetch: server.fetch,
+        hostname: host,
+        port,
+      })
+      return {
+        url: handle.url,
+      }
+    },
     stop: () =>
-      new Promise<void>((resolve) => {
-        if (handle)
-          handle.close(() => resolve())
-        else
-          resolve()
-      }),
+      handle?.stop(),
   }
 }
