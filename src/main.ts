@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 
 import process from 'node:process'
+import type { RunnerHandle } from '@grammyjs/runner'
+import { run } from '@grammyjs/runner'
 import { createBot } from '#root/bot/index.js'
 import { config } from '#root/config.js'
 import { logger } from '#root/logger.js'
-import { createServer, createServerManager } from '#root/server/index.js'
 
 function onShutdown(cleanUp: () => Promise<void>) {
   let isShuttingDown = false
@@ -19,67 +20,32 @@ function onShutdown(cleanUp: () => Promise<void>) {
   process.on('SIGTERM', handleShutdown)
 }
 
-async function startPolling() {
+try {
   const bot = createBot(config.BOT_TOKEN)
+  let runner: undefined | RunnerHandle
 
   // graceful shutdown
   onShutdown(async () => {
-    await bot.stop()
-  })
+    logger.info('Shutdown')
 
-  // start bot
-  await bot.start({
-    allowed_updates: config.BOT_ALLOWED_UPDATES,
-    onStart: ({ username }) =>
-      logger.info({
-        msg: 'Bot running...',
-        username,
-      }),
-  })
-}
-
-async function startWebhook() {
-  const bot = createBot(config.BOT_TOKEN)
-  const server = createServer(bot)
-  const serverManager = createServerManager(server)
-
-  // graceful shutdown
-  onShutdown(async () => {
-    await serverManager.stop()
+    await runner?.stop()
   })
 
   // to prevent receiving updates before the bot is ready
   await bot.init()
 
-  // start server
-  const info = await serverManager.start(
-    config.BOT_SERVER_HOST,
-    config.BOT_SERVER_PORT,
-  )
   logger.info({
-    msg: 'Server started',
-    url:
-      info.family === 'IPv6'
-        ? `http://[${info.address}]:${info.port}`
-        : `http://${info.address}:${info.port}`,
+    msg: 'Bot running...',
+    username: bot.botInfo.username,
   })
 
-  // set webhook
-  await bot.api.setWebhook(config.BOT_WEBHOOK, {
-    allowed_updates: config.BOT_ALLOWED_UPDATES,
-    secret_token: config.BOT_WEBHOOK_SECRET,
+  runner = run(bot, {
+    runner: {
+      fetch: {
+        allowed_updates: config.BOT_ALLOWED_UPDATES,
+      },
+    },
   })
-  logger.info({
-    msg: 'Webhook was set',
-    url: config.BOT_WEBHOOK,
-  })
-}
-
-try {
-  if (config.BOT_MODE === 'webhook')
-    await startWebhook()
-  else if (config.BOT_MODE === 'polling')
-    await startPolling()
 }
 catch (error) {
   logger.error(error)
