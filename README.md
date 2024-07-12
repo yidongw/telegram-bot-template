@@ -32,13 +32,18 @@ Follow these steps to set up and run your bot using this template:
 
     Start by creating a new repository using this template. You can do this by clicking [here](https://github.com/bot-base/telegram-bot-template/generate).
 
-2. **Environment Variables Setup**
+2. **Environment Setup**
 
     Create an environment variables file by copying the provided example file:
      ```bash
      cp .env.example .env
      ```
     Open the newly created `.env` file and set the `BOT_TOKEN` environment variable.
+
+    Start Postgres
+    ```bash
+    docker run --name=postgres --rm -itd -p 5432:5432 -e POSTGRES_PASSWORD=Crunchy2 -e POSTGRES_DB=tgbot postgres:latest
+    ```
 
 3. **Launching the Bot**
 
