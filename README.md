@@ -20,7 +20,7 @@ Bot starter template based on [grammY](https://grammy.dev/) bot framework.
         - [Conversations](#grammy-conversations-grammydevpluginsconversations)
         - [Runner](#grammy-runner-grammydevpluginsrunner)
     - Databases:
-      - [Prisma ORM](#prisma-orm-prismaio)
+      - [Drizzle ORM](#drizzle-orm)
     - Runtimes:
       - [Bun](#bun-bunsh)
 
@@ -55,9 +55,13 @@ Follow these steps to set up and run your bot using this template:
     ```bash
     bun install
     ```
+    Generate migrations:
+    ```bash
+    bun run generate
+    ```
     Run migrations:
     ```bash
-    npx prisma migrate dev
+    bun run migrate
     ```
     Start the bot in watch mode (auto-reload when code changes):
     ```bash
@@ -85,7 +89,7 @@ Follow these steps to set up and run your bot using this template:
 
     Run migrations:
     ```bash
-    npx prisma migrate deploy
+    bun run migrate
     ```
 
     Start the bot in production mode:
@@ -235,36 +239,6 @@ npm i @grammyjs/runner
 ```
 
 4. Follow [the usage instructions](https://github.com/bot-base/telegram-bot-template/tree/example/plugin-runner#usage) in the `example/plugin-runner` branch.
-
-### Prisma ORM ([prisma.io](https://prisma.io))
-
-Branch:
-[example/orm-prisma](https://github.com/bot-base/telegram-bot-template/tree/example/orm-prisma)
-([open diff](https://github.com/bot-base/telegram-bot-template/compare/example/orm-prisma))
-
-Use in your project:
-
-1. Add the template repository as a remote
-
-```sh
-git remote add template git@github.com:bot-base/telegram-bot-template.git
-git remote update
-```
-
-2. Merge example
-
-```sh
-git merge template/example/orm-prisma -X theirs --squash --no-commit --allow-unrelated-histories
-```
-
-3. Install dependencies
-
-```sh
-npm i -D prisma
-npm i @prisma/client
-```
-
-4. Follow [the usage instructions](https://github.com/bot-base/telegram-bot-template/tree/example/orm-prisma#usage) in the `example/orm-prisma` branch.
 
 ### Bun ([bun.sh](https://bun.sh))
 

@@ -1,6 +1,16 @@
+import process from 'node:process'
 import z from 'zod'
 import { parseEnv, port } from 'znv'
 import { API_CONSTANTS } from 'grammy'
+
+let env: any
+
+if (typeof Bun !== 'undefined' && Bun.env) {
+  env = Bun.env
+}
+else {
+  env = process.env
+}
 
 function createConfigFromEnvironment(environment: NodeJS.ProcessEnv) {
   const config = parseEnv(environment, {
@@ -24,6 +34,7 @@ function createConfigFromEnvironment(environment: NodeJS.ProcessEnv) {
       .array(z.enum(API_CONSTANTS.ALL_UPDATE_TYPES))
       .default([]),
     BOT_ADMINS: z.array(z.number()).default([]),
+    DATABASE_URL: z.string(),
   })
 
   if (config.BOT_MODE === 'webhook') {
@@ -43,11 +54,11 @@ function createConfigFromEnvironment(environment: NodeJS.ProcessEnv) {
 
   return {
     ...config,
-    isDev: Bun.env.NODE_ENV === 'development',
-    isProd: Bun.env.NODE_ENV === 'production',
+    isDev: env.NODE_ENV === 'development',
+    isProd: env.NODE_ENV === 'production',
   }
 }
 
 export type Config = ReturnType<typeof createConfigFromEnvironment>
 
-export const config = createConfigFromEnvironment(Bun.env)
+export const config = createConfigFromEnvironment(env)

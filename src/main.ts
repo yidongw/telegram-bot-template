@@ -1,11 +1,11 @@
 #!/usr/bin/env tsx
 
 import process from 'node:process'
-import { prisma } from './prisma/index.js'
 import { createBot } from '#root/bot/index.js'
 import { config } from '#root/config.js'
 import { logger } from '#root/logger.js'
 import { createServer, createServerManager } from '#root/server/index.js'
+import drizzle, { client, testConnection } from '#root/db/index.js'
 
 function onShutdown(cleanUp: () => Promise<void>) {
   let isShuttingDown = false
@@ -13,8 +13,10 @@ function onShutdown(cleanUp: () => Promise<void>) {
     if (isShuttingDown)
       return
     isShuttingDown = true
-    logger.info('Shutdown')
+    logger.info('Shuting down')
     await cleanUp()
+    logger.info('Shutdown complete')
+    process.exit(0)
   }
   process.on('SIGINT', handleShutdown)
   process.on('SIGTERM', handleShutdown)
@@ -22,16 +24,17 @@ function onShutdown(cleanUp: () => Promise<void>) {
 
 async function startPolling() {
   const bot = createBot(config.BOT_TOKEN, {
-    prisma,
+    drizzle,
   })
 
   // graceful shutdown
   onShutdown(async () => {
     await bot.stop()
+    await client.end({ timeout: 5 })
   })
 
-  // connect to database
-  await prisma.$connect()
+  // test connect to database
+  await testConnection()
 
   // start bot
   await bot.start({
@@ -46,7 +49,7 @@ async function startPolling() {
 
 async function startWebhook() {
   const bot = createBot(config.BOT_TOKEN, {
-    prisma,
+    drizzle,
   })
   const server = createServer(bot)
   const serverManager = createServerManager(server)
@@ -54,10 +57,11 @@ async function startWebhook() {
   // graceful shutdown
   onShutdown(async () => {
     await serverManager.stop()
+    await client.end({ timeout: 5 })
   })
 
-  // connect to database
-  await prisma.$connect()
+  // test connect to database
+  await testConnection()
 
   // to prevent receiving updates before the bot is ready
   await bot.init()
